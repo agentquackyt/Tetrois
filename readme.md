@@ -8,9 +8,9 @@ A compact, terminal-based Tetris clone written in C++ with ANSI color support an
 
 - Terminal-rendered Tetris gameplay with colored blocks and a ghost piece
 - Next-piece preview and a small UI panel showing score, level, lines, and highscore
-- Smooth rendering via line-diff updates to minimize flicker
 - Simple scoring (standard Tetris line scores) and level progression
 - Portable single-source implementation (no external libraries required)
+- Game over screen and improved rendering using ncurses
 
 ## Controls
 
@@ -25,33 +25,31 @@ A compact, terminal-based Tetris clone written in C++ with ANSI color support an
 
 ## Build & Run
 
-1. Compile (example):
+1. Compile (leagacy):
 
    ```bash
-   g++ -std=c++17 ./tetrois.cpp -o ./tetrois
+   g++ -std=c++17 tetrois_leagacy.cpp -o tetrois_leagacy
    ```
 
-2. Run:
+2. Compile the ncurses version (tetrois.cpp):
+
+  ```bash
+  g++ -std=c++17 tetrois.cpp -lncurses -o tetrois
+  ```
+
+3. Run:
 
    ```bash
    ./tetrois
    ```
 
+  Or:
+
+  ```bash
+  ./tetrois_leagacy
+  ```
+
 The code uses only the C++ standard library and POSIX terminal APIs, so any modern g++ on macOS or Linux should work.
-
-## Environment / Debug Helpers
-
-- `RENDER_ONCE` — set to print a single frame and exit (useful for screenshots or tests):
-
-  ```bash
-  RENDER_ONCE=1 ./tetrois
-  ```
-
-- `FORCE_COLS` / `FORCE_ROWS` — override terminal dimensions used for layout when testing:
-
-  ```bash
-  FORCE_COLS=100 FORCE_ROWS=30 ./tetrois
-  ```
 
 ## 💾 Highscore
 
@@ -60,13 +58,7 @@ The high score is stored in `highscore.txt` (a single integer). If the current s
 ## Troubleshooting & Tips
 
 - Ensure your terminal supports ANSI colors and is wide enough for the UI.
-- If you see rendering issues, try increasing terminal size or use `FORCE_COLS` / `FORCE_ROWS` for testing.
-
-## Contributing
-
-Feel free to open issues or submit pull requests. Ideas for improvements:
-
-- Improve the rendering engine
+- If you see rendering issues, try increasing terminal size
 
 ## License
 
