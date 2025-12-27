@@ -34,6 +34,10 @@ Just go to releases and download the newest version, follow the instructions the
   ```bash
   g++ -std=c++17 tetrois.cpp -lncurses -o tetrois
   ```
+  You might need to install ncurses first (Command for apt package manager)
+  ```bash
+  sudo apt-get install libncurses5-dev libncursesw5-dev
+  ```
 
 3. Run:
 
