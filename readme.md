@@ -24,12 +24,10 @@ A compact, terminal-based Tetris clone written in C++ with ANSI color support an
 > Note: Controls are case-sensitive and expect lowercase keys.
 
 ## Build & Run
-
-1. Compile (leagacy):
-
-   ```bash
-   g++ -std=c++17 tetrois_leagacy.cpp -o tetrois_leagacy
-   ```
+### Prebuilt
+Just go to releases and download the newest version, follow the instructions there
+### Compile from scratch
+1. Clone this repository
 
 2. Compile the ncurses version (tetrois.cpp):
 
@@ -42,12 +40,6 @@ A compact, terminal-based Tetris clone written in C++ with ANSI color support an
    ```bash
    ./tetrois
    ```
-
-  Or:
-
-  ```bash
-  ./tetrois_leagacy
-  ```
 
 The code uses only the C++ standard library and POSIX terminal APIs, so any modern g++ on macOS or Linux should work.
 
