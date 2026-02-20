@@ -272,7 +272,7 @@ static void drawCell(int y, int x, const std::string &s, short pair, int attrs =
     if (pair > 0)
         attron(COLOR_PAIR(pair));
     if (attrs != 0)
-        attron(attrs);œ
+        attron(attrs);
     mvaddnstr(y, x, s.c_str(), CELL_W);
     if (attrs != 0)
         attroff(attrs);
