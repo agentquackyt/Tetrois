@@ -22,11 +22,11 @@ const std::string CLEAN = " . ";
 const std::vector<std::vector<std::string>> shapeDisplays = {
     {"[#][#]", "[#][#]", "", ""},
     {"[#][#][#][#]", "", "", ""},
-    {" [#][#]", "[#][#] ", "", ""},
-    {"[#][#] ", " [#][#]", "", ""},
-    {" [#] ", "[#][#][#]", "", ""},
-    {"[#][#][#]", "[#]     ", "", ""},
-    {"[#][#][#]", "    [#] ", "", ""},
+    {"   [#][#]", "[#][#] ", "", ""},
+    {"[#][#]   ", "   [#][#]", "", ""},
+    {"   [#]", "[#][#][#]", "", ""},
+    {"[#][#][#]", "[#]", "", ""},
+    {"[#][#][#]", "      [#]", "", ""},
 };
 
 // ncurses color pairs
@@ -272,7 +272,7 @@ static void drawCell(int y, int x, const std::string &s, short pair, int attrs =
     if (pair > 0)
         attron(COLOR_PAIR(pair));
     if (attrs != 0)
-        attron(attrs);
+        attron(attrs);œ
     mvaddnstr(y, x, s.c_str(), CELL_W);
     if (attrs != 0)
         attroff(attrs);
@@ -514,9 +514,8 @@ static void renderFrame(
     delwin(gridWin);
 }
 
-int main()
-{
-    Tetris game(GRID_ROWS, GRID_COLS);
+bool gameLoop() {
+Tetris game(GRID_ROWS, GRID_COLS);
     bool gameOver = false;
 
     int score = 0;
@@ -557,6 +556,7 @@ int main()
     Tetromino nextT = getNewTetromino(nextIdx);
 
     int finalScore = 0;
+    bool restartRequested = false;
     {
         CursesSession curses;
 
@@ -677,7 +677,7 @@ int main()
 
         // Show a full-screen Game Over screen and wait for user input
         // (stay inside the curses session so it's full-screen)
-        auto showGameOverScreen = [&](int finalScoreDisplay)
+        auto showGameOverScreen = [&](int finalScoreDisplay) -> bool
         {
             // ASCII art for "GAME OVER" (simple, monospaced)
             const std::vector<std::string> art = {
@@ -714,18 +714,19 @@ int main()
             std::string scoreLine = "Final Score: " + std::to_string(finalScoreDisplay);
             drawText(startY + (int)art.size() + 1, std::max(0, (cols - (int)scoreLine.size()) / 2), PAIR_SCORE, scoreLine, A_BOLD);
 
-            // Prompt
-            std::string prompt = "Press any key to exit";
+            // Prompt (Space restarts)
+            std::string prompt = "Press Space to restart, any other key to exit";
             drawText(startY + (int)art.size() + 3, std::max(0, (cols - (int)prompt.size()) / 2), PAIR_LABEL, prompt, A_BOLD);
 
-            // Ignore input for the first 1 second, then accept any key
+            // Ignore input for the first 1 second, then accept a key and return whether it was Space
             nodelay(stdscr, TRUE);
             auto start = std::chrono::steady_clock::now();
+            int pressed = ERR;
             while (true) {
                 int c = getch();
                 auto now = std::chrono::steady_clock::now();
                 auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
-                if (ms < 1000) {
+                if (ms < 500) {
                     // during the initial 1s, discard any keys
                     if (c != ERR) {
                         // consume and ignore
@@ -734,15 +735,17 @@ int main()
                     continue;
                 }
                 // After 1s, if a key is already waiting, consume it immediately; otherwise block until one
-                if (c != ERR) break;
+                if (c != ERR) { pressed = c; break; }
                 nodelay(stdscr, FALSE);
-                getch();
+                pressed = getch();
                 nodelay(stdscr, TRUE);
                 break;
             }
+
+            return (pressed == ' ');
         };
 
-        showGameOverScreen(score);
+        restartRequested = showGameOverScreen(score);
         finalScore = score;
     } // endwin() here
 
@@ -750,7 +753,18 @@ int main()
     {
         std::ofstream hf("highscore.txt");
         hf << finalScore;
+        hf.close();
     }
 
+    return restartRequested;
+}
+
+int main()
+{   
+    bool is_running{true};
+    do
+    {
+        is_running = gameLoop();
+    } while (is_running);
     return 0;
 }
