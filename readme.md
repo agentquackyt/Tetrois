@@ -47,6 +47,14 @@ Just go to releases and download the newest version, follow the instructions the
 
 The code uses only the C++ standard library and POSIX terminal APIs, so any modern g++ on macOS or Linux should work.
 
+### Windows Users
+Just download the prebuilt version, it saves you a lot of pain. 
+
+```bash
+$ g++ tetrois.cpp -o tetrois.exe -I/mingw64/include/ncursesw -DNCURSES_STATIC -static -lncursesw
+```
+in the MSYS2 MINGW64 shell after installing packages.
+
 ## 💾 Highscore
 
 The high score is stored in `highscore.txt` (a single integer). If the current score is greater than or equal to the stored highscore at game exit, `highscore.txt` will be updated.

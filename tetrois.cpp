@@ -1,3 +1,9 @@
+#ifdef _WIN32
+    #include <curses.h>
+#else
+    #include <ncurses.h>
+#endif
+
 #include <chrono>
 #include <thread>
 #include <vector>
@@ -6,7 +12,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
-#include <ncurses.h>
 
 // Configuration
 constexpr int GRID_ROWS = 20;
@@ -205,24 +210,28 @@ static void initColors()
 {
     if (!has_colors())
         return;
+    
     start_color();
-    use_default_colors();
+    
+    // On Windows, -1 (transparency) often fails in the standard console.
+    // We will use COLOR_BLACK as a safe fallback.
+    short bg = COLOR_BLACK; 
 
-    init_pair(PAIR_TITLE, COLOR_MAGENTA, -1);
-    init_pair(PAIR_LABEL, COLOR_YELLOW, -1);
-    init_pair(PAIR_SCORE, COLOR_GREEN, -1);
-    init_pair(PAIR_LEVEL, COLOR_CYAN, -1);
-    init_pair(PAIR_LINES, COLOR_BLUE, -1);
-    init_pair(PAIR_HIGHSCORE, COLOR_RED, -1);
-    init_pair(PAIR_GHOST, COLOR_WHITE, -1);
+    init_pair(PAIR_TITLE, COLOR_MAGENTA, bg);
+    init_pair(PAIR_LABEL, COLOR_YELLOW, bg);
+    init_pair(PAIR_SCORE, COLOR_GREEN, bg);
+    init_pair(PAIR_LEVEL, COLOR_CYAN, bg);
+    init_pair(PAIR_LINES, COLOR_BLUE, bg);
+    init_pair(PAIR_HIGHSCORE, COLOR_RED, bg);
+    init_pair(PAIR_GHOST, COLOR_WHITE, bg);
 
-    init_pair(PAIR_PIECE_BASE + 0, COLOR_YELLOW, -1);
-    init_pair(PAIR_PIECE_BASE + 1, COLOR_CYAN, -1);
-    init_pair(PAIR_PIECE_BASE + 2, COLOR_GREEN, -1);
-    init_pair(PAIR_PIECE_BASE + 3, COLOR_RED, -1);
-    init_pair(PAIR_PIECE_BASE + 4, COLOR_MAGENTA, -1);
-    init_pair(PAIR_PIECE_BASE + 5, COLOR_BLUE, -1);
-    init_pair(PAIR_PIECE_BASE + 6, COLOR_WHITE, -1);
+    init_pair(PAIR_PIECE_BASE + 0, COLOR_YELLOW, bg);
+    init_pair(PAIR_PIECE_BASE + 1, COLOR_CYAN, bg);
+    init_pair(PAIR_PIECE_BASE + 2, COLOR_GREEN, bg);
+    init_pair(PAIR_PIECE_BASE + 3, COLOR_RED, bg);
+    init_pair(PAIR_PIECE_BASE + 4, COLOR_MAGENTA, bg);
+    init_pair(PAIR_PIECE_BASE + 5, COLOR_BLUE, bg);
+    init_pair(PAIR_PIECE_BASE + 6, COLOR_WHITE, bg);
 }
 
 struct CursesSession
@@ -505,6 +514,9 @@ static void renderFrame(
         wnoutrefresh(panelWin);
     if (stackedWin)
         wnoutrefresh(stackedWin);
+
+     mvaddch(termRows - 1, termCols - 1, ' '); // move cursor out of the way   
+    
     doupdate();
 
     if (panelWin)
